@@ -1,0 +1,8 @@
+streamlit
+openai
+google-generativeai
+anthropic
+networkx
+matplotlib
+gitpython
+pyvis

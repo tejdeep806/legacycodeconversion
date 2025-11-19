@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 400px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "font": {"color": "black"}, "id": "ADDAMT.jcl", "label": "ADDAMT.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\ADDAMT.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "COBRUN.jcl", "label": "COBRUN.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\COBRUN.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "IGYWC.jcl", "label": "IGYWC.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jclproc\\IGYWC.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "IGYWCL.jcl", "label": "IGYWCL.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jclproc\\IGYWCL.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0001J.jcl", "label": "CBL0001J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0001J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0002J.jcl", "label": "CBL0002J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0002J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0003J.jcl", "label": "CBL0003J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0003J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0004J.jcl", "label": "CBL0004J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0004J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0005J.jcl", "label": "CBL0005J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0005J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0006J.jcl", "label": "CBL0006J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0006J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0007J.jcl", "label": "CBL0007J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0007J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0008J.jcl", "label": "CBL0008J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0008J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0009J.jcl", "label": "CBL0009J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0009J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0010J.jcl", "label": "CBL0010J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0010J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0011J.jcl", "label": "CBL0011J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0011J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0012J.jcl", "label": "CBL0012J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0012J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0013J.jcl", "label": "CBL0013J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0013J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0014J.jcl", "label": "CBL0014J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0014J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0033J.jcl", "label": "CBL0033J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL0033J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "HELLO.jcl", "label": "HELLO.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\HELLO.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "IGYWCLG.jcl", "label": "IGYWCLG.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jclproc\\IGYWCLG.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL006AJ.jcl", "label": "CBL006AJ.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\CBL006AJ.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "PAYROL00.jcl", "label": "PAYROL00.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\PAYROL00.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "PAYROL0X.jcl", "label": "PAYROL0X.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\PAYROL0X.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "SRCHBINJ.jcl", "label": "SRCHBINJ.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\SRCHBINJ.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "SRCHSERJ.jcl", "label": "SRCHSERJ.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #2 - Learning COBOL\\Labs\\jcl\\SRCHSERJ.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0106C.cbl", "label": "CBL0106C.cbl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Challenges\\Debugging\\cbl\\CBL0106C.cbl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0106.cbl", "label": "CBL0106.cbl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Challenges\\Debugging\\cbl\\CBL0106.cbl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBL0106J.jcl", "label": "CBL0106J.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Challenges\\Debugging\\jcl\\CBL0106J.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB21C.jcl", "label": "CBLDB21C.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CBLDB21C.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB21.cbl", "label": "CBLDB21.cbl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\cbl\\CBLDB21.cbl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DB2CBL.jcl", "label": "DB2CBL.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jclproc\\DB2CBL.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DBRMLIB.jcl", "label": "DBRMLIB.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\DBRMLIB.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB21R.jcl", "label": "CBLDB21R.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CBLDB21R.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB22C.jcl", "label": "CBLDB22C.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CBLDB22C.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB22.cbl", "label": "CBLDB22.cbl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\cbl\\CBLDB22.cbl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB22R.jcl", "label": "CBLDB22R.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CBLDB22R.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB23C.jcl", "label": "CBLDB23C.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CBLDB23C.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB23.cbl", "label": "CBLDB23.cbl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\cbl\\CBLDB23.cbl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CBLDB23R.jcl", "label": "CBLDB23R.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CBLDB23R.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "CRETBL.jcl", "label": "CRETBL.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\CRETBL.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DB2JCL.jcl", "label": "DB2JCL.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jclproc\\DB2JCL.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DB2SETUP.jcl", "label": "DB2SETUP.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\DB2SETUP.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "LOADTBL.jcl", "label": "LOADTBL.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\LOADTBL.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "SELTBL.jcl", "label": "SELTBL.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jcl\\SELTBL.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DSNUPROC.jcl", "label": "DSNUPROC.jcl", "shape": "dot", "size": 10, "title": "COBOL Programming Course #3 - Advanced Topics\\Labs\\jclproc\\DSNUPROC.jcl"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DEPTPAY.CBL", "label": "DEPTPAY.CBL", "shape": "dot", "size": 10, "title": "COBOL Programming Course #4 - Testing\\Labs\\cbl\\DEPTPAY.CBL"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "DEPTPAY.JCL", "label": "DEPTPAY.JCL", "shape": "dot", "size": 10, "title": "COBOL Programming Course #4 - Testing\\Labs\\jcl\\DEPTPAY.JCL"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "EMPPAY.CBL", "label": "EMPPAY.CBL", "shape": "dot", "size": 10, "title": "COBOL Programming Course #4 - Testing\\Labs\\cbl\\EMPPAY.CBL"}, {"color": "#97c2fc", "font": {"color": "black"}, "id": "EMPPAY.JCL", "label": "EMPPAY.JCL", "shape": "dot", "size": 10, "title": "COBOL Programming Course #4 - Testing\\Labs\\jcl\\EMPPAY.JCL"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "ADDAMT.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "ADDAMT.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "ADDAMT.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "COBRUN.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "COBRUN.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "IGYWCL.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0001J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0001J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0001J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0002J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0002J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0002J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0003J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0003J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0003J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0004J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0004J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0004J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0005J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0005J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0005J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0006J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0006J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0006J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0007J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0007J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0007J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0008J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0008J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0008J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0009J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0009J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0009J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0010J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0010J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0010J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0011J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0011J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0011J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0012J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0012J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0012J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0013J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0013J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0013J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0014J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0014J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0014J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0033J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0033J.jcl", "to": "HELLO.jcl", "width": 1}, {"arrows": "to", "from": "CBL0033J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0033J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "HELLO.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "HELLO.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "HELLO.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "HELLO.jcl", "to": "IGYWCLG.jcl", "width": 1}, {"arrows": "to", "from": "CBL006AJ.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL006AJ.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL006AJ.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "IGYWCLG.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "IGYWCLG.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "PAYROL00.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "PAYROL00.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "PAYROL00.jcl", "to": "IGYWCLG.jcl", "width": 1}, {"arrows": "to", "from": "PAYROL0X.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "PAYROL0X.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "PAYROL0X.jcl", "to": "IGYWCLG.jcl", "width": 1}, {"arrows": "to", "from": "SRCHBINJ.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "SRCHBINJ.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "SRCHBINJ.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "SRCHSERJ.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "SRCHSERJ.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "SRCHSERJ.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0106C.cbl", "to": "CBL0106.cbl", "width": 1}, {"arrows": "to", "from": "CBL0106J.jcl", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "CBL0106J.jcl", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "CBL0106J.jcl", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "CBL0106J.jcl", "to": "CBL0106.cbl", "width": 1}, {"arrows": "to", "from": "CBLDB21C.jcl", "to": "CBLDB21.cbl", "width": 1}, {"arrows": "to", "from": "CBLDB21C.jcl", "to": "DB2CBL.jcl", "width": 1}, {"arrows": "to", "from": "DB2CBL.jcl", "to": "DBRMLIB.jcl", "width": 1}, {"arrows": "to", "from": "CBLDB21R.jcl", "to": "CBLDB21.cbl", "width": 1}, {"arrows": "to", "from": "CBLDB22C.jcl", "to": "CBLDB22.cbl", "width": 1}, {"arrows": "to", "from": "CBLDB22C.jcl", "to": "DB2CBL.jcl", "width": 1}, {"arrows": "to", "from": "CBLDB22R.jcl", "to": "CBLDB22.cbl", "width": 1}, {"arrows": "to", "from": "CBLDB23C.jcl", "to": "CBLDB23.cbl", "width": 1}, {"arrows": "to", "from": "CBLDB23C.jcl", "to": "DB2CBL.jcl", "width": 1}, {"arrows": "to", "from": "CBLDB23R.jcl", "to": "CBLDB23.cbl", "width": 1}, {"arrows": "to", "from": "CRETBL.jcl", "to": "DB2JCL.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB21.cbl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB22.cbl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB23.cbl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB21C.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB21R.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB22C.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB22R.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB23C.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CBLDB23R.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "CRETBL.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "DBRMLIB.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "LOADTBL.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "SELTBL.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "DB2CBL.jcl", "width": 1}, {"arrows": "to", "from": "DB2SETUP.jcl", "to": "DB2JCL.jcl", "width": 1}, {"arrows": "to", "from": "LOADTBL.jcl", "to": "DSNUPROC.jcl", "width": 1}, {"arrows": "to", "from": "SELTBL.jcl", "to": "DB2JCL.jcl", "width": 1}, {"arrows": "to", "from": "DEPTPAY.CBL", "to": "DEPTPAY.JCL", "width": 1}, {"arrows": "to", "from": "DEPTPAY.JCL", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "DEPTPAY.JCL", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "DEPTPAY.JCL", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "DEPTPAY.JCL", "to": "DEPTPAY.CBL", "width": 1}, {"arrows": "to", "from": "EMPPAY.CBL", "to": "EMPPAY.JCL", "width": 1}, {"arrows": "to", "from": "EMPPAY.JCL", "to": "COBRUN.jcl", "width": 1}, {"arrows": "to", "from": "EMPPAY.JCL", "to": "IGYWC.jcl", "width": 1}, {"arrows": "to", "from": "EMPPAY.JCL", "to": "IGYWCL.jcl", "width": 1}, {"arrows": "to", "from": "EMPPAY.JCL", "to": "EMPPAY.CBL", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
