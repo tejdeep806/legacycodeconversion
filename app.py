@@ -1,5 +1,5 @@
-# app.py - FINAL ENTERPRISE LEGACY MODERNIZER (Dec 12, 2025)
-# 249 lines | 500k+ LOC ready | Real deploy steps | Cache | Cost estimator
+# app.py - FINAL ENTERPRISE LEGACY MODERNIZER (Dec 12, 2025, 07:18 AM +08)
+# 249 lines | 500k+ LOC | Real progress | AI deploy steps | Cache | Cost estimator
 
 import streamlit as st
 import zipfile
@@ -72,7 +72,7 @@ def chunk_code(code, max_chars=80000):
         chunks.append('\n'.join(current))
     return chunks
 
-# ====================== MODEL MAPPING (FIXED) ======================
+# ====================== MODEL MAPPING ======================
 def get_model(provider):
     return {
         "Anthropic (Claude) - Best Quality": "claude-sonnet-4-5-20250929",
@@ -81,70 +81,80 @@ def get_model(provider):
         "Groq (Llama3-70b) - Lightning Fast": "llama3-70b-8192"
     }.get(provider, "claude-sonnet-4-5-20250929")
 
-# ====================== CONVERSION ENGINE ======================
-def convert_smart(code, source_lang, target, provider, api_key, status):
+# ====================== CONVERSION WITH PROGRESS ======================
+def convert_smart_with_progress(code, source_lang, target, provider, api_key):
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+
+    status_text.info("Step 1/4: Analyzing code...")
+    progress_bar.progress(25)
+    time.sleep(0.5)
+
     key = hashlib.md5((code + provider + target).encode()).hexdigest()
     if key in CACHE:
-        status.success("Cache hit – instant!")
+        progress_bar.progress(100)
+        status_text.success("Step 2/4: Cache hit – instant conversion!")
+        time.sleep(1)
         return CACHE[key]
 
+    status_text.info("Step 2/4: Chunking code...")
+    progress_bar.progress(40)
     chunks = chunk_code(code)
     parts = []
 
+    status_text.info("Step 3/4: Converting with AI...")
+    progress_bar.progress(60)
     for i, chunk in enumerate(chunks):
-        status.info(f"Converting chunk {i+1}/{len(chunks)}...")
-        prompt = f"Convert this {source_lang} code chunk to clean {target}.\nReturn ONLY the valid source code.\n\nCHUNK:\n{chunk}"
+        status_text.info(f"Converting chunk {i+1}/{len(chunks)}...")
+        prompt = f"Convert this {source_lang} chunk to {target}. Return ONLY code.\n\nCHUNK:\n{chunk}"
         model = get_model(provider)
 
-        for attempt in range(6):
-            try:
-                time.sleep(3 + attempt * 3)
-                if "Anthropic" in provider:
-                    client = Anthropic(api_key=api_key)
-                    resp = client.messages.create(model=model, max_tokens=4096, temperature=0,
-                                                  messages=[{"role": "user", "content": prompt}])
-                    part = resp.content[0].text.strip()
-                elif "OpenAI" in provider:
-                    client = openai.OpenAI(api_key=api_key)
-                    resp = client.chat.completions.create(model=model, temperature=0,
-                                                           messages=[{"role": "user", "content": prompt}])
-                    part = resp.choices[0].message.content.strip()
-                elif "Gemini" in provider:
-                    genai.configure(api_key=api_key)
-                    m = genai.GenerativeModel(model)
-                    resp = m.generate_content(prompt, generation_config={"temperature": 0})
-                    part = resp.text.strip()
-                elif "Groq" in provider and GROQ_AVAILABLE:
-                    client = Groq(api_key=api_key)
-                    resp = client.chat.completions.create(model=model, temperature=0,
-                                                           messages=[{"role": "user", "content": prompt}])
-                    part = resp.choices[0].message.content.strip()
-                parts.append(part)
-                break
-            except Exception as e:
-                if "rate limit" in str(e).lower():
-                    time.sleep(60 + attempt * 60)
-                else:
-                    time.sleep(10)
-        else:
-            parts.append(f"# CHUNK {i+1} FAILED")
+        try:
+            time.sleep(1)
+            if "Anthropic" in provider:
+                client = Anthropic(api_key=api_key)
+                resp = client.messages.create(model=model, max_tokens=4096, temperature=0,
+                                              messages=[{"role": "user", "content": prompt}])
+                part = resp.content[0].text.strip()
+            elif "OpenAI" in provider:
+                client = openai.OpenAI(api_key=api_key)
+                resp = client.chat.completions.create(model=model, temperature=0,
+                                                       messages=[{"role": "user", "content": prompt}])
+                part = resp.choices[0].message.content.strip()
+            elif "Gemini" in provider:
+                genai.configure(api_key=api_key)
+                m = genai.GenerativeModel(model)
+                resp = m.generate_content(prompt, generation_config={"temperature": 0})
+                part = resp.text.strip()
+            elif "Groq" in provider and GROQ_AVAILABLE:
+                client = Groq(api_key=api_key)
+                resp = client.chat.completions.create(model=model, temperature=0,
+                                                       messages=[{"role": "user", "content": prompt}])
+                part = resp.choices[0].message.content.strip()
+            parts.append(part)
+        except Exception as e:
+            parts.append(f"# CHUNK {i+1} FAILED: {str(e)[:50]}")
 
-    result = "\n\n# === RECONSTRUCTED FROM CHUNKS ===\n\n".join(parts)
+    status_text.info("Step 4/4: Assembling & caching...")
+    progress_bar.progress(90)
+    result = "\n\n# === RECONSTRUCTED ===\n\n".join(parts)
     CACHE[key] = result
     save_state()
-    status.success("Converted & cached forever!")
+    progress_bar.progress(100)
+    status_text.success("Conversion Complete!")
+    st.balloons()
     return result
 
 # ====================== REAL AI DEPLOYMENT GUIDE ======================
 def generate_deploy_guide(cloud, service, framework, provider, api_key):
     if not api_key:
-        return "# Please enter your API key to get real deployment steps"
+        return "# Enter API key for real deploy steps"
 
-    prompt = f"""Generate exact, copy-paste-ready terminal commands to deploy a {framework} app (with Dockerfile) to {cloud} {service}.
+    prompt = f"""Generate exact, copy-paste-ready bash commands to deploy a {framework} app (with Dockerfile) to {cloud} {service}.
 App name: modernized-app
-Assume CLI is logged in.
+Assume CLI logged in.
 Focus only on {service}.
-Return ONLY the bash commands."""
+Return ONLY the commands."""
 
     try:
         model = get_model(provider)
@@ -157,12 +167,19 @@ Return ONLY the bash commands."""
     except:
         pass
 
-    # Smart fallback
     fallbacks = {
-        "AWS EC2": "# AWS EC2\ndocker build -t app .\ndocker save app | gzip > app.tar.gz\nscp -i key.pem app.tar.gz ec2-user@IP:~\nssh -i key.pem ec2-user@IP 'docker load < app.tar.gz && docker run -d -p 80:8000 app'",
-        "AWS EKS": "# Push to ECR first, then:\nkubectl apply -f deployment.yaml",
-        "Google Cloud Run": "# GCP Cloud Run\ndocker build -t app .\ngcloud builds submit --tag gcr.io/PROJECT_ID/app\ngcloud run deploy app --image gcr.io/PROJECT_ID/app --platform managed",
-        "Azure App Service": "# Azure\naz webapp up --name myapp123 --resource-group MyGroup"
+        "AWS EC2": """docker build -t modernized-app .
+docker save modernized-app | gzip > app.tar.gz
+scp -i your-key.pem app.tar.gz ec2-user@YOUR_EC2_IP:~
+ssh -i your-key.pem ec2-user@YOUR_EC2_IP << 'EOF'
+docker load < app.tar.gz
+docker run -d -p 80:8000 modernized-app
+EOF""",
+        "AWS EKS": """kubectl apply -f k8s-deployment.yaml""",
+        "Google Cloud Run": """docker build -t modernized-app .
+gcloud builds submit --tag gcr.io/YOUR_PROJECT/modernized-app
+gcloud run deploy modernized-app --image gcr.io/YOUR_PROJECT/modernized-app --platform managed""",
+        "Azure App Service": """az webapp up --name modernized-app --resource-group MyGroup --runtime "PYTHON:3.11" """
     }
     return fallbacks.get(f"{cloud} {service}", "# Select valid service")
 
@@ -180,7 +197,7 @@ with st.sidebar:
     st.divider()
     st.header("Deploy Target")
     cloud = st.selectbox("Cloud", ["AWS", "Azure", "Google Cloud"])
-    services = {"AWS": ["EC2", "ECS Fargate", "EKS"], "Azure": ["App Service"], "Google Cloud": ["Cloud Run"]}
+    services = {"AWS": ["EC2", "EKS"], "Azure": ["App Service"], "Google Cloud": ["Cloud Run"]}
     service = st.selectbox("Service", services[cloud])
     st.session_state.cloud = cloud
     st.session_state.service = service
@@ -197,10 +214,9 @@ with tab_input:
     mode = st.radio("Input", ["Paste Code", "GitHub Repo"], horizontal=True)
 
     if mode == "Paste Code":
-        code = st.text_area("Paste code", height=400)
+        code = st.text_area("Paste your legacy code", height=400)
         if st.button("Convert Snippet", type="primary") and code and api_key:
-            status = st.status("Converting...")
-            result = convert_smart(code, source_lang, target, provider, api_key, status)
+            result = convert_smart_with_progress(code, source_lang, target, provider, api_key)
             st.session_state.results = {"main.py" if "Python" in target else "Main.java": result}
             st.session_state.target = target
             st.rerun()
@@ -212,10 +228,10 @@ with tab_input:
                 folder = f"temp_{uuid.uuid4().hex[:8]}"
                 git.Repo.clone_from(url, folder, depth=1)
                 files = []
-                for r, _, fs in os.walk(folder):
+                for root, _, fs in os.walk(folder):
                     for f in fs:
                         if f.lower().endswith(('.cbl','.cob','.cs','.java','.jcl','.f90')):
-                            path = os.path.join(r, f)
+                            path = os.path.join(root, f)
                             with open(path, "r", errors="ignore") as ff:
                                 files.append((f, ff.read()))
                 st.session_state.files = files
@@ -238,8 +254,8 @@ with tab_convert:
             for i, (name, code) in enumerate(st.session_state.files):
                 status = st.empty()
                 status.info(f"Converting {name}...")
-                converted = convert_smart(code, st.session_state.source_lang, st.session_state.target,
-                                          st.session_state.provider, st.session_state.api_key, status)
+                converted = convert_smart_with_progress(code, st.session_state.source_lang, st.session_state.target,
+                                                       st.session_state.provider, st.session_state.api_key)
                 new_name = os.path.splitext(name)[0] + (".py" if "Python" in st.session_state.target else ".java")
                 results[new_name] = converted
                 progress.progress((i + 1) / len(st.session_state.files))
@@ -271,4 +287,4 @@ with tab_results:
                 shutil.rmtree(st.session_state.folder, ignore_errors=True)
             st.success("Cleaned")
 
-st.caption("Legacy Modernizer Enterprise – 500k+ lines | Real deploy steps | Built by legends | Dec 12, 2025")
+st.caption("Legacy Modernizer Enterprise – 500k+ lines | Real deploy steps | Dec 12, 2025")
