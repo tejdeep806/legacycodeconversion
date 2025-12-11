@@ -1,5 +1,4 @@
-# app.py - FINAL LEGACY MODERNIZER PRO (Dec 12, 2025)
-# Beautiful banner + Unit tests + Deploy steps + 500k+ lines ready
+# app.py - LEGACY MODERNIZATION PRO (Final Clean Version - Dec 12, 2025)
 
 import streamlit as st
 import zipfile
@@ -26,58 +25,44 @@ try:
 except ImportError:
     pass
 
-st.set_page_config(page_title="Legacy Modernizer Pro", layout="wide", page_icon="Rocket")
+st.set_page_config(page_title="Legacy Modernization Pro", layout="wide", page_icon="Rocket")
 
-# ====================== CUSTOMIZABLE BANNER ======================
-with st.sidebar:
-    st.header("App Branding")
-    app_title = st.text_input("App Title", value="Legacy Modernizer Pro")
-    tagline = st.text_input("Tagline", value="From Mainframe to Cloud in Minutes")
-    company = st.text_input("Company", value="Your Company")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        primary_color = st.color_picker("Primary Color", "#1e3c72")
-    with col2:
-        accent_color = st.color_picker("Accent Color", "#3b82f6")
-    
-    text_color = st.color_picker("Text Color", "#ffffff")
-    logo_url = st.text_input("Logo URL (optional)", placeholder="https://yourcompany.com/logo.png")
-    show_logo = st.checkbox("Show Logo", value=True)
-
-def render_banner():
-    logo_html = f'<img src="{logo_url}" style="height:70px; margin-right:20px; border-radius:10px;">' if show_logo and logo_url else ""
-    
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, {primary_color}, {accent_color});
-        padding: 50px 30px;
-        border-radius: 20px;
-        margin: 20px 0 50px 0;
-        text-align: center;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        color: {text_color};
-        font-family: 'Segoe UI', sans-serif;
+# ====================== FIXED BEAUTIFUL BANNER ======================
+st.markdown("""
+<div style="
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    padding: 50px 30px;
+    border-radius: 20px;
+    margin: 20px 0 50px 0;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+">
+    <h1 style="
+        margin:0; 
+        font-size:4.5rem; 
+        font-weight:bold; 
+        text-shadow: 3px 3px 12px rgba(0,0,0,0.6);
     ">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap;">
-            {logo_html}
-            <div>
-                <h1 style="margin:0; font-size:4rem; font-weight:bold; text-shadow: 3px 3px 10px rgba(0,0,0,0.5);">
-                    {app_title}
-                </h1>
-                <p style="margin:20px 0 10px; font-size:2rem; opacity:0.95;">
-                    {tagline}
-                </p>
-                <p style="margin:0; font-size:1.4rem; opacity:0.85;">
-                    {company} • AI-Powered • 500k+ Lines • Auto Tests • One-Click Deploy
-                </p>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# RENDER BANNER FIRST
-render_banner()
+        Legacy Modernization Pro
+    </h1>
+    <p style="
+        margin:20px 0 10px; 
+        font-size:2.2rem; 
+        opacity:0.95;
+    ">
+        From Mainframe to Cloud in Minutes
+    </p>
+    <p style="
+        margin:0; 
+        font-size:1.5rem; 
+        opacity:0.85;
+    ">
+        AI-Powered • 500k+ Lines • Auto Unit Tests • One-Click Deploy
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 # ====================== CACHE SYSTEM ======================
 CACHE_FILE = "conversion_cache.json"
@@ -121,7 +106,7 @@ def convert_smart_with_progress(code, source_lang, target, provider, api_key):
     key = hashlib.md5((code + provider + target).encode()).hexdigest()
     if key in CACHE:
         progress.progress(100)
-        status.success("Cache hit – instant conversion!")
+        status.success("Cache hit – instant!")
         time.sleep(1)
         return CACHE[key]
 
@@ -133,7 +118,6 @@ def convert_smart_with_progress(code, source_lang, target, provider, api_key):
 
     try:
         if "Anthropic" in provider:
-            from anthropic import Anthropic
             client = Anthropic(api_key=api_key)
             resp = client.messages.create(model=model, max_tokens=4096, temperature=0,
                                           messages=[{"role": "user", "content": prompt}])
@@ -160,7 +144,6 @@ def convert_smart_with_progress(code, source_lang, target, provider, api_key):
         status.success("Conversion Complete!")
         st.balloons()
         return result
-
     except Exception as e:
         st.error(f"Error: {str(e)[:100]}")
         return "# CONVERSION FAILED"
@@ -182,7 +165,6 @@ def generate_unit_tests(converted_code, filename, target, provider, api_key):
     model = get_model(provider)
     try:
         if "Anthropic" in provider:
-            from anthropic import Anthropic
             client = Anthropic(api_key=api_key)
             resp = client.messages.create(model=model, max_tokens=4096, temperature=0,
                                           messages=[{"role": "user", "content": prompt}])
@@ -202,7 +184,6 @@ def generate_deploy_guide(cloud, service, framework, provider, api_key):
     try:
         model = get_model(provider)
         if "Anthropic" in provider:
-            from anthropic import Anthropic
             client = Anthropic(api_key=api_key)
             resp = client.messages.create(model=model, max_tokens=1500, temperature=0,
                                           messages=[{"role": "user", "content": prompt}])
@@ -211,10 +192,10 @@ def generate_deploy_guide(cloud, service, framework, provider, api_key):
         pass
     return f"# Deploy guide for {cloud} {service}"
 
-# ====================== SIDEBAR (AI + DEPLOY) ======================
+# ====================== SIDEBAR ======================
 with st.sidebar:
-    st.header("AI Engine")
-    provider = st.selectbox("Model", [
+    st.header("AI Model")
+    provider = st.selectbox("Choose AI", [
         "Anthropic (Claude) - Best Quality",
         "OpenAI (GPT-4o) - Fast & Smart",
         "Google Gemini - Free Tier Available"
@@ -253,13 +234,13 @@ with tab_input:
     else:
         url = st.text_input("GitHub Repository URL")
         if st.button("Clone Repository") and url:
-            with st.spinner("Cloning..."):
+            with st.spinner("Cloning repository..."):
                 folder = f"temp_{uuid.uuid4().hex[:8]}"
                 git.Repo.clone_from(url, folder, depth=1)
                 files = []
                 for root, _, fs in os.walk(folder):
                     for f in fs:
-                        if f.lower().endswith(('.cbl','.cob','.cs','.java')):
+                        if f.lower().endswith(('.cbl','.cob','.cs','.java','.jcl','.f90')):
                             path = os.path.join(root, f)
                             with open(path, "r", errors="ignore") as ff:
                                 files.append((f, ff.read()))
@@ -267,7 +248,7 @@ with tab_input:
                 st.session_state.folder = folder
                 st.session_state.source_lang = source_lang
                 st.session_state.target = target
-                st.success(f"Found {len(files)} files")
+                st.success(f"Found {len(files)} files – ready to convert")
 
 # ====================== CONVERT TAB ======================
 with tab_convert:
@@ -292,13 +273,13 @@ with tab_results:
         project = {"Dockerfile": "FROM python:3.11-slim\nCMD [\"uvicorn\", \"main:app\"]" if "Python" in st.session_state.target else "FROM openjdk:17\nCMD [\"java\", \"Main\"]", **st.session_state.results}
 
         if st.button("Generate Unit Tests", type="primary"):
-            with st.spinner("Generating tests..."):
+            with st.spinner("Generating unit tests..."):
                 all_tests = {}
                 for name, code in st.session_state.results.items():
                     tests = generate_unit_tests(code, name, st.session_state.target, provider, api_key)
                     all_tests.update(tests)
                 st.session_state.tests = all_tests
-                st.success("All tests generated!")
+                st.success("All unit tests generated!")
 
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w") as z:
@@ -317,4 +298,4 @@ with tab_results:
                                          st.session_state.target, st.session_state.provider, st.session_state.api_key)
             st.code(guide, language="bash")
 
-st.caption("© 2025 Your Company – Legacy Modernizer Pro | Built with AI")
+st.caption("Legacy Modernization Pro – Built for the future | Dec 2025")
