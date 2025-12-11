@@ -1,5 +1,5 @@
-# app.py - FINAL LEGACY MODERNIZER PRO + CUSTOM BANNER + UNIT TESTS + DEPLOY STEPS
-# Full working code | Dec 12, 2025
+# app.py - FINAL LEGACY MODERNIZER PRO (Dec 12, 2025)
+# Beautiful banner + Unit tests + Deploy steps + 500k+ lines ready
 
 import streamlit as st
 import zipfile
@@ -30,46 +30,53 @@ st.set_page_config(page_title="Legacy Modernizer Pro", layout="wide", page_icon=
 
 # ====================== CUSTOMIZABLE BANNER ======================
 with st.sidebar:
-    st.header("App Branding & Settings")
-    
+    st.header("App Branding")
     app_title = st.text_input("App Title", value="Legacy Modernizer Pro")
     tagline = st.text_input("Tagline", value="From Mainframe to Cloud in Minutes")
-    company = st.text_input("Company Name", value="Your Company")
+    company = st.text_input("Company", value="Your Company")
     
     col1, col2 = st.columns(2)
     with col1:
         primary_color = st.color_picker("Primary Color", "#1e3c72")
     with col2:
-        accent_color = st.color_picker("Accent Color", "#2a5298")
+        accent_color = st.color_picker("Accent Color", "#3b82f6")
     
     text_color = st.color_picker("Text Color", "#ffffff")
-    logo_url = st.text_input("Company Logo URL (optional)", placeholder="https://yourcompany.com/logo.png")
+    logo_url = st.text_input("Logo URL (optional)", placeholder="https://yourcompany.com/logo.png")
     show_logo = st.checkbox("Show Logo", value=True)
 
 def render_banner():
-    logo_html = f'<img src="{logo_url}" style="height:70px; margin-right:20px; border-radius:8px;" />' if show_logo and logo_url else ""
+    logo_html = f'<img src="{logo_url}" style="height:70px; margin-right:20px; border-radius:10px;">' if show_logo and logo_url else ""
     
     st.markdown(f"""
     <div style="
-        text-align: center;
-        padding: 40px 20px;
         background: linear-gradient(135deg, {primary_color}, {accent_color});
+        padding: 50px 30px;
         border-radius: 20px;
-        margin: 20px 0 40px 0;
+        margin: 20px 0 50px 0;
+        text-align: center;
         box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         color: {text_color};
+        font-family: 'Segoe UI', sans-serif;
     ">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap;">
             {logo_html}
             <div>
-                <h1 style="margin:0; font-size:3.8rem; font-weight:bold; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">{app_title}</h1>
-                <p style="margin:15px 0 8px; font-size:1.9rem; opacity:0.95;">{tagline}</p>
-                <p style="margin:0; font-size:1.3rem; opacity:0.8;">{company} • AI-Powered • 500k+ Lines • Auto Tests • One-Click Deploy</p>
+                <h1 style="margin:0; font-size:4rem; font-weight:bold; text-shadow: 3px 3px 10px rgba(0,0,0,0.5);">
+                    {app_title}
+                </h1>
+                <p style="margin:20px 0 10px; font-size:2rem; opacity:0.95;">
+                    {tagline}
+                </p>
+                <p style="margin:0; font-size:1.4rem; opacity:0.85;">
+                    {company} • AI-Powered • 500k+ Lines • Auto Tests • One-Click Deploy
+                </p>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
+# RENDER BANNER FIRST
 render_banner()
 
 # ====================== CACHE SYSTEM ======================
@@ -119,13 +126,12 @@ def convert_smart_with_progress(code, source_lang, target, provider, api_key):
         return CACHE[key]
 
     progress.progress(30)
-    status.info("Calling AI model...")
+    status.info("Converting with AI...")
 
-    prompt = f"Convert this {source_lang} code to production-ready {target}.\nReturn ONLY the clean source code — no markdown.\n\nCODE:\n{code}"
+    prompt = f"Convert this {source_lang} code to clean {target}. Return ONLY source code.\n\nCODE:\n{code}"
     model = get_model(provider)
 
     try:
-        time.sleep(1)
         if "Anthropic" in provider:
             from anthropic import Anthropic
             client = Anthropic(api_key=api_key)
@@ -156,7 +162,7 @@ def convert_smart_with_progress(code, source_lang, target, provider, api_key):
         return result
 
     except Exception as e:
-        st.error(f"Conversion failed: {str(e)[:100]}")
+        st.error(f"Error: {str(e)[:100]}")
         return "# CONVERSION FAILED"
 
 # ====================== UNIT TEST GENERATION ======================
@@ -167,10 +173,10 @@ def generate_unit_tests(converted_code, filename, target, provider, api_key):
 
     status = st.status("Generating unit tests...")
     if "Python" in target:
-        prompt = f"Generate comprehensive pytest tests for this Python code. Make it runnable.\n\nCODE:\n{converted_code}"
+        prompt = f"Generate comprehensive pytest tests for this Python code:\n\n{converted_code}"
         test_file = f"test_{os.path.splitext(filename)[0]}.py"
     else:
-        prompt = f"Generate JUnit 5 tests for this Java class.\n\nCODE:\n{converted_code}"
+        prompt = f"Generate JUnit 5 tests for this Java class:\n\n{converted_code}"
         test_file = f"{os.path.splitext(filename)[0]}Test.java"
 
     model = get_model(provider)
@@ -190,6 +196,8 @@ def generate_unit_tests(converted_code, filename, target, provider, api_key):
 
 # ====================== DEPLOYMENT GUIDE ======================
 def generate_deploy_guide(cloud, service, framework, provider, api_key):
+    if not api_key:
+        return "# Enter API key to generate deploy steps"
     prompt = f"Generate exact bash commands to deploy a {framework} app to {cloud} {service}. Return only commands."
     try:
         model = get_model(provider)
@@ -201,9 +209,9 @@ def generate_deploy_guide(cloud, service, framework, provider, api_key):
             return resp.content[0].text.strip()
     except:
         pass
-    return f"# Deploy guide for {cloud} {service} (check connection)"
+    return f"# Deploy guide for {cloud} {service}"
 
-# ====================== SIDEBAR ======================
+# ====================== SIDEBAR (AI + DEPLOY) ======================
 with st.sidebar:
     st.header("AI Engine")
     provider = st.selectbox("Model", [
@@ -218,18 +226,19 @@ with st.sidebar:
     st.divider()
     st.header("Deploy Target")
     cloud = st.selectbox("Cloud", ["AWS", "Azure", "Google Cloud"])
-    service = st.selectbox("Service", ["EC2", "ECS Fargate", "EKS", "App Service", "Cloud Run"])
+    services = {"AWS": ["EC2", "ECS Fargate", "EKS"], "Azure": ["App Service"], "Google Cloud": ["Cloud Run"]}
+    service = st.selectbox("Service", services[cloud])
     st.session_state.cloud = cloud
     st.session_state.service = service
 
 # ====================== TABS ======================
-tab_input, tab_convert, tab_results = st.tabs(["1. Input", "2. Convert", "3. Deploy + Tests"])
+tab_input, tab_convert, tab_results = st.tabs(["1. Input", "2. Convert", "3. Results & Deploy"])
 
 # ====================== INPUT TAB ======================
 with tab_input:
     col1, col2 = st.columns(2)
-    with col1: source_lang = st.selectbox("From", ["COBOL", "JCL", "Fortran", "C#", "VB6"])
-    with col2: target = st.selectbox("To", ["Python + FastAPI", "Java + Spring Boot"])
+    with col1: source_lang = st.selectbox("Source Language", ["COBOL", "JCL", "C#", "VB6"])
+    with col2: target = st.selectbox("Target", ["Python + FastAPI", "Java + Spring Boot"])
 
     mode = st.radio("Input Method", ["Paste Code", "GitHub Repository"], horizontal=True)
 
@@ -244,13 +253,13 @@ with tab_input:
     else:
         url = st.text_input("GitHub Repository URL")
         if st.button("Clone Repository") and url:
-            with st.spinner("Cloning repository..."):
+            with st.spinner("Cloning..."):
                 folder = f"temp_{uuid.uuid4().hex[:8]}"
                 git.Repo.clone_from(url, folder, depth=1)
                 files = []
                 for root, _, fs in os.walk(folder):
                     for f in fs:
-                        if f.lower().endswith(('.cbl','.cob','.cs','.java','.jcl','.f90')):
+                        if f.lower().endswith(('.cbl','.cob','.cs','.java')):
                             path = os.path.join(root, f)
                             with open(path, "r", errors="ignore") as ff:
                                 files.append((f, ff.read()))
@@ -258,12 +267,11 @@ with tab_input:
                 st.session_state.folder = folder
                 st.session_state.source_lang = source_lang
                 st.session_state.target = target
-                st.success(f"Found {len(files)} files – ready to convert")
+                st.success(f"Found {len(files)} files")
 
 # ====================== CONVERT TAB ======================
 with tab_convert:
     if "files" in st.session_state:
-        total = len(st.session_state.files)
         if st.button("START FULL CONVERSION", type="primary"):
             progress = st.progress(0)
             results = {}
@@ -274,7 +282,7 @@ with tab_convert:
                                                         st.session_state.provider, st.session_state.api_key)
                 new_name = os.path.splitext(name)[0] + (".py" if "Python" in st.session_state.target else ".java")
                 results[new_name] = converted
-                progress.progress((i + 1) / total)
+                progress.progress((i + 1) / len(st.session_state.files))
             st.session_state.results = results
             st.balloons()
 
@@ -301,7 +309,7 @@ with tab_results:
                     z.writestr(f"tests/{n}", c)
         buffer.seek(0)
 
-        st.success("CONVERSION COMPLETE!")
+        st.success("CONVERSION & TESTS COMPLETE!")
         st.download_button("Download Package + Tests", buffer, "modernized-with-tests.zip", type="primary")
 
         with st.expander(f"Deploy to {st.session_state.cloud} {st.session_state.service}", expanded=True):
@@ -309,4 +317,4 @@ with tab_results:
                                          st.session_state.target, st.session_state.provider, st.session_state.api_key)
             st.code(guide, language="bash")
 
-st.caption(f"© 2025 {company} • Built with AI • From Legacy to Future")
+st.caption("© 2025 Your Company – Legacy Modernizer Pro | Built with AI")
