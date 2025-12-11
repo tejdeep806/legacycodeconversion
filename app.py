@@ -1,5 +1,5 @@
-# app.py - FINAL ENTERPRISE 500K+ LINES READY VERSION (Nov 21, 2025)
-# No errors | Chunking | Resume | Cost estimator | Multi-model
+# app.py - FINAL ENTERPRISE 500K+ LINES READY VERSION (Dec 12, 2025)
+# Fixed KeyError | Chunking | Resume | Cost estimator | Multi-model
 
 import streamlit as st
 import zipfile
@@ -19,9 +19,12 @@ import google.generativeai as genai
 try:
     from groq import Groq
     GROQ_AVAILABLE = True
-except:
+except ImportError:
     GROQ_AVAILABLE = False
-from anthropic import Anthropic
+try:
+    from anthropic import Anthropic
+except ImportError:
+    pass  # Handled in function
 
 st.set_page_config(page_title="Legacy Modernizer Enterprise ∞", layout="wide", page_icon="🦾")
 
@@ -69,12 +72,22 @@ def chunk_code(code, max_chars=80000):
         chunks.append('\n'.join(current))
     return chunks
 
+# ====================== FIXED MODEL MAPPING ======================
+def get_model_for_provider(provider):
+    provider_map = {
+        "Anthropic (Claude) - Best Quality": "claude-sonnet-4-5-20250929",
+        "OpenAI (GPT-4o) - Fast & Smart": "gpt-4o-2024-08-06",
+        "Google Gemini - Free Tier Available": "gemini-1.5-pro",
+        "Groq (Llama3-70b) - Lightning Fast": "llama3-70b-8192"
+    }
+    return provider_map.get(provider, "claude-sonnet-4-5-20250929")  # Safe fallback
+
 # ====================== MULTI-MODEL CONVERSION ======================
 def convert_smart(code, source_lang, target, provider, api_key, status):
-    key = hashlib.md5((code + provider + target).encode()).hexdigest()
-    if key in CACHE:
+    full_key = hashlib.md5((code + provider + target).encode()).hexdigest()
+    if full_key in CACHE:
         status.success("Cache hit!")
-        return CACHE[key]
+        return CACHE[full_key]
 
     chunks = chunk_code(code)
     parts = []
@@ -83,12 +96,7 @@ def convert_smart(code, source_lang, target, provider, api_key, status):
         status.info(f"Chunk {i+1}/{len(chunks)}...")
         prompt = f"Convert this {source_lang} chunk to {target}. Return ONLY code.\n\nCHUNK:\n{chunk}"
 
-        model = {
-            "Anthropic (Claude)": "claude-sonnet-4-5-20250929",
-            "OpenAI (GPT-4o)": "gpt-4o-2024-08-06",
-            "Google Gemini": "gemini-1.5-pro",
-            "Groq (Llama3-70b)": "llama3-70b-8192"
-        }[provider]
+        model = get_model_for_provider(provider)  # FIXED: No more KeyError
 
         for attempt in range(5):
             try:
@@ -113,6 +121,8 @@ def convert_smart(code, source_lang, target, provider, api_key, status):
                     resp = client.chat.completions.create(model=model, temperature=0,
                                                            messages=[{"role": "user", "content": prompt}])
                     part = resp.choices[0].message.content.strip()
+                else:
+                    part = "# UNKNOWN PROVIDER – CHECK SELECTION"
 
                 parts.append(part)
                 break
@@ -124,8 +134,8 @@ def convert_smart(code, source_lang, target, provider, api_key, status):
         else:
             parts.append(f"# CHUNK {i+1} FAILED")
 
-    result = "\n\n# === RECONSTRUCTED ===\n\n".join(parts)
-    CACHE[key] = result
+    result = "\n\n# === RECONSTRUCTED FROM CHUNKS ===\n\n".join(parts)
+    CACHE[full_key] = result
     save_state()
     status.success("Done & cached!")
     return result
@@ -133,11 +143,13 @@ def convert_smart(code, source_lang, target, provider, api_key, status):
 # ====================== SIDEBAR ======================
 with st.sidebar:
     st.header("🤖 AI Model")
-    models = ["Anthropic (Claude) - Best Quality"]
-    models += ["OpenAI (GPT-4o) - Fast & Smart"]
-    models += ["Google Gemini - Free Tier Available"]
+    models = [
+        "Anthropic (Claude) - Best Quality",
+        "OpenAI (GPT-4o) - Fast & Smart",
+        "Google Gemini - Free Tier Available"
+    ]
     if GROQ_AVAILABLE:
-        models += ["Groq (Llama3-70b) - Lightning Fast"]
+        models.append("Groq (Llama3-70b) - Lightning Fast")
     provider = st.selectbox("Choose Model", models)
     api_key = st.text_input("API Key", type="password")
     st.session_state.provider = provider
@@ -146,7 +158,12 @@ with st.sidebar:
     st.divider()
     st.header("☁️ Deploy Target")
     cloud = st.selectbox("Cloud", ["AWS", "Azure", "Google Cloud"])
-    service = st.selectbox("Service", ["EC2", "ECS Fargate", "EKS", "App Service", "Cloud Run"])
+    services = {
+        "AWS": ["EC2", "ECS Fargate", "EKS"],
+        "Azure": ["App Service", "AKS"],
+        "Google Cloud": ["Cloud Run", "GKE"]
+    }
+    service = st.selectbox("Service", services[cloud])
     st.session_state.cloud = cloud
     st.session_state.service = service
 
@@ -166,6 +183,7 @@ with tab_input:
             status = st.status("Converting...")
             result = convert_smart(code, source_lang, target, provider, api_key, status)
             st.session_state.results = {"main.py" if "Python" in target else "Main.java": result}
+            st.session_state.target = target
             st.rerun()
 
     else:
@@ -228,4 +246,4 @@ with tab_results:
                 shutil.rmtree(st.session_state.folder, ignore_errors=True)
             st.success("Cleaned")
 
-st.caption("Legacy Modernizer Enterprise – Built for 500k+ lines | Nov 21, 2025")
+st.caption("Legacy Modernizer Enterprise – Built for 500k+ lines | Dec 12, 2025")
